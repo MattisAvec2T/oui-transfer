@@ -12,11 +12,12 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
   
   server:
-    image: node:23
-    env_file:
-      - ./.env
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./app:/app
-    command: 'sh -c "cd /app && npm run start"'
+        build:
+            context: ./app
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            - "3000:3000"
+        volumes:
+          - ./app:/app
+
