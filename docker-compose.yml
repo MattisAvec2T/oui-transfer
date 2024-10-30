@@ -12,12 +12,12 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
   
   server:
-        build:
-            context: ./app
-            dockerfile: Dockerfile
-        restart: always
-        ports:
-            - "3000:3000"
-        volumes:
-          - ./app:/app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+      - /app/node_modules
 
