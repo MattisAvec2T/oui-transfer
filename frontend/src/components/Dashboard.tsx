@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button, DownloadIcon, Table } from 'evergreen-ui';
 
 interface DashboardProps {
   uploadedFiles: { name: string; alias: string }[];
@@ -33,21 +34,32 @@ const Dashboard: React.FC<DashboardProps> = ({ uploadedFiles }) => {
     const lastDotIndex = alias.lastIndexOf('.');
     return lastDotIndex !== -1 ? alias.slice(0, lastDotIndex) : alias;
   };
-  
 
   return (
     <div>
       <h2>Tableau de Bord</h2>
-      <ul>
-        {uploadedFiles.map((file, index) => (
-          <li key={index}>
-            {file.name}{' '}
-            <button onClick={() => handleDownload(file.alias)}>
+      <Table>
+        <Table.Head>
+          <Table.TextCell flexBasis={560} flexShrink={0} flexGrow={0}>
+            Nom du Fichier
+          </Table.TextCell>
+          <Table.TextCell>Actions</Table.TextCell>
+        </Table.Head>
+        <Table.Body>
+          {uploadedFiles.map((file, index) => (
+            <Table.Row key={index}>
+              <Table.TextCell flexBasis={560} flexShrink={0} flexGrow={0}>
+                {file.name}
+              </Table.TextCell>
+              <Table.TextCell>
+              <Button marginY={8} iconBefore={DownloadIcon} onClick={() => handleDownload(file.alias)}>
               Télécharger en ZIP
-            </button>
-          </li>
-        ))}
-      </ul>
+        </Button>
+              </Table.TextCell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
     </div>
   );
 };
