@@ -3,6 +3,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import FileUpload from './components/FileUpload';
 import Dashboard from './components/Dashboard';
 import './App.css';
+import Auth from './pages/Auth';
 
 const App: React.FC = () => {
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -20,6 +21,7 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/" element={<FileUpload onFileUpload={handleFileUpload} />} />
                 <Route path="/dashboard" element={<Dashboard uploadedFiles={uploadedFiles} />} />
+                <Route path="/authentification" element={<Auth />} />
             </Routes>
         </div>
     );

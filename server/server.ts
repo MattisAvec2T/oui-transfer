@@ -1,13 +1,21 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import pool from 'db'
 import multer from 'multer'
 import path from 'path'
+import authRoutes from './routes/auth.route'
 
 const server = express()
 const port = 3000
 
-server.use(cors())
+server.use(cors({
+    origin: ["http://localhost:5173"],
+}));
+server.use(express.json())
+server.use(cookieParser());
+
+server.use(authRoutes)
 
 server.get("/", (req, res, next) => {
     res.json({
