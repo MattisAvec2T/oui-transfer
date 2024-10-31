@@ -4,6 +4,7 @@ import FileUpload from './components/FileUpload';
 import Dashboard from './components/Dashboard';
 import { TabNavigation, Tab } from 'evergreen-ui';
 import './App.css';
+import Auth from './pages/Auth';
 
 const App: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; alias: string, size: number }[]>([]);
@@ -38,6 +39,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<FileUpload onFileUpload={handleFileUpload} />} />
         <Route path="/dashboard" element={<Dashboard uploadedFiles={uploadedFiles} onDelete={handleDeleteFile} />} />
+        <Route path="/authentification" element={<Auth />} />
       </Routes>
     </div>
   );

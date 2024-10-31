@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser'
 import multer from 'multer';
 import path from 'path';
+import authRoutes from './routes/auth.route'
 import fs from 'fs';
 import JSZip from 'jszip';
 import pool from 'db';
@@ -14,6 +16,10 @@ const server = express();
 const port = 3000;
 
 server.use(cors());
+server.use(express.json())
+server.use(cookieParser());
+
+server.use(authRoutes)
 
 server.get("/", (req, res, next) => {
     res.json({
