@@ -1,9 +1,14 @@
-import { Router, Request, Response } from "express";
-import { registerController, loginController, logoutController } from "../controllers/auth.controller"
+import { Router } from "express";
+import { registerController, loginController, logoutController } from "../controllers/auth.controller";
+import { checkSchema } from "express-validator";
+import { userSchema } from "../schemas/user.schema"
+import { App } from "types/app";
 
-const authRoutes = Router();
-authRoutes.post("/register", registerController);
-authRoutes.post("/login", loginController);
-authRoutes.post("/logout", logoutController);
+export default function getAuthRoutes(app: App) {
+    const authRoutes = Router();
+    authRoutes.post("/register", checkSchema(userSchema().withUsername()), registerController(app));
+    authRoutes.post("/login", checkSchema(userSchema().schema), loginController(app));
+    authRoutes.post("/logout", logoutController());
 
-export default authRoutes;
+    return authRoutes;
+}
