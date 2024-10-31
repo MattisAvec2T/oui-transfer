@@ -26,8 +26,8 @@ const App: React.FC = () => {
           <Tab
             key={tab.title}
             is={Link}
-            isSelected={location.pathname === tab.path}
-          >
+            to={tab.path}
+            >
             {tab.title}
           </Tab>
         ))}
