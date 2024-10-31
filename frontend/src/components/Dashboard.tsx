@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Button, DownloadIcon, Table, TrashIcon } from 'evergreen-ui';
+import { DownloadIcon, Table, TrashIcon, LinkIcon, Tooltip, Position, IconButton } from 'evergreen-ui';
 
 interface DashboardProps {
   uploadedFiles: { name: string; alias: string; size: number }[];
@@ -55,7 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({ uploadedFiles, onDelete }) => {
           <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
             Taille du Fichier (Mo)
           </Table.TextCell>
-          <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
+          <Table.TextCell flexBasis={300} flexShrink={0} flexGrow={1}>
             Actions
           </Table.TextCell>
         </Table.Head>
@@ -68,22 +68,31 @@ const Dashboard: React.FC<DashboardProps> = ({ uploadedFiles, onDelete }) => {
               <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
                 {(file.size / (1024 * 1024)).toFixed(2)} MB
               </Table.TextCell>
-              <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
-                <Button
-                  marginY={8}
-                  iconBefore={DownloadIcon}
-                  onClick={() => handleDownload(file.alias)}
-                >
-                  Télécharger en ZIP
-                </Button>
-                <Button
-                  marginY={8}
-                  iconBefore={TrashIcon}
-                  intent="danger"
-                  onClick={() => onDelete(file.alias)}
-                >
-                  Supprimer
-                </Button>
+              <Table.TextCell flexBasis={300} flexShrink={0} flexGrow={1}>
+
+                <Tooltip content="Télécharger en ZIP" position={Position.TOP}>
+                  <IconButton
+                    icon={DownloadIcon}
+                    onClick={() => handleDownload(file.alias)}
+                    marginRight={15}
+                  />
+                </Tooltip>
+
+                <Tooltip content="Supprimer" position={Position.TOP}>
+                  <IconButton
+                    icon={TrashIcon}
+                    intent="danger"
+                    onClick={() => onDelete(file.alias)}
+                    marginRight={15}
+                  />
+                </Tooltip>
+
+                <Tooltip content="Générer lien de partage" position={Position.TOP}>
+                  <IconButton
+                    icon={LinkIcon}
+                  />
+                </Tooltip>
+
               </Table.TextCell>
             </Table.Row>
           ))}

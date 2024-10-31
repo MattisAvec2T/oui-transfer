@@ -18,7 +18,7 @@ const App: React.FC = () => {
   };
 
   const tabs = [
-    { title: 'Uploader un Fichier', path: '/' },
+    { title: 'Uploader un Fichier', path: '/file-upload' },
     { title: 'Tableau de Bord', path: '/dashboard' },
   ];
 
@@ -37,7 +37,7 @@ const App: React.FC = () => {
         ))}
       </TabNavigation>
       <Routes>
-        <Route path="/" element={<FileUpload onFileUpload={handleFileUpload} />} />
+        <Route path="/file-upload" element={<FileUpload onFileUpload={handleFileUpload} />} />
         <Route path="/dashboard" element={<Dashboard uploadedFiles={uploadedFiles} onDelete={handleDeleteFile} />} />
         <Route path="/authentification" element={<Auth />} />
       </Routes>
