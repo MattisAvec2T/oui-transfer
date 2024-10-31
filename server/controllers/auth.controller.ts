@@ -44,6 +44,8 @@ export const loginController = async (req: Request, res: Response) => {
             process.env.JWT_SECRET!,
             { expiresIn: process.env.JWT_EXPIRES }
         );
+        console.log(token);
+        
         res.status(201).cookie("token", token).json({ success: true, user: user });
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error", error: error.message });

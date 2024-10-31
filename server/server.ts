@@ -15,7 +15,10 @@ const __dirname = path.dirname(__filename);
 const server = express();
 const port = 3000;
 
-server.use(cors());
+server.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}));
 server.use(express.json())
 server.use(cookieParser());
 

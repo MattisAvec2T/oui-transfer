@@ -18,6 +18,7 @@ const Login: React.FC<LoginProps> = ({ onSwitch }) => {
             headers: {
                 "Content-Type": "application/json"
             },
+            credentials: "include",
             body: JSON.stringify({ mail, password })
         })
         .then(response => response.json())
