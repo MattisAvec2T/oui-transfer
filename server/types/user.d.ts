@@ -1,13 +1,11 @@
 export interface UserInterface {
-    id?: number,
-    title: string,
-    completed: boolean
+    username?: string,
+    mail: string,
+    password: string
 }
 
 export interface UserRepositoryInterface {
-    getAll: () => Promise<UserInterface[]>
     getOne: (id: number) => Promise<UserInterface>
-    insert: (user: UserInterface) => Promise<UserInterface>
-    update: (user: UserInterface) => Promise<UserInterface>
-    delete: (id: number) => Promise<void>
+    insert: (user: UserInterface) => Promise<UserInterface | Error>
+    getByMailPassword: (user: UserInterface) => Promise<UserInterface | void>
 }
