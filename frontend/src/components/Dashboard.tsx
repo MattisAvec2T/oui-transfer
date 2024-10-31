@@ -1,11 +1,19 @@
-import React from 'react';
-import { Button, DownloadIcon, Table } from 'evergreen-ui';
+import React, { useMemo } from 'react';
+import { Button, DownloadIcon, Table, TrashIcon } from 'evergreen-ui';
 
 interface DashboardProps {
-  uploadedFiles: { name: string; alias: string }[];
+  uploadedFiles: { name: string; alias: string; size: number }[];
+  onDelete: (alias: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ uploadedFiles }) => {
+const Dashboard: React.FC<DashboardProps> = ({ uploadedFiles, onDelete }) => {
+  const MAX_QUOTA_MB = 2048;
+
+  const quotaRemaining = useMemo(() => {
+    const usedSpace = uploadedFiles.reduce((total, file) => total + file.size / (1024 * 1024), 0);
+    return MAX_QUOTA_MB - usedSpace;
+  }, [uploadedFiles]);
+
   const handleDownload = async (alias: string) => {
     try {
       const response = await fetch(`http://localhost:3000/download-zip/${alias}`);
@@ -38,23 +46,44 @@ const Dashboard: React.FC<DashboardProps> = ({ uploadedFiles }) => {
   return (
     <div>
       <h2>Tableau de Bord</h2>
+      <p>Quota restant : {quotaRemaining.toFixed(2)} MB</p>
       <Table>
         <Table.Head>
-          <Table.TextCell flexBasis={560} flexShrink={0} flexGrow={0}>
+          <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
             Nom du Fichier
           </Table.TextCell>
-          <Table.TextCell>Actions</Table.TextCell>
+          <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
+            Taille du Fichier (Mo)
+          </Table.TextCell>
+          <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
+            Actions
+          </Table.TextCell>
         </Table.Head>
         <Table.Body>
           {uploadedFiles.map((file, index) => (
             <Table.Row key={index}>
-              <Table.TextCell flexBasis={560} flexShrink={0} flexGrow={0}>
+              <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
                 {file.name}
               </Table.TextCell>
-              <Table.TextCell>
-              <Button marginY={8} iconBefore={DownloadIcon} onClick={() => handleDownload(file.alias)}>
-              Télécharger en ZIP
-        </Button>
+              <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
+                {(file.size / (1024 * 1024)).toFixed(2)} MB
+              </Table.TextCell>
+              <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>
+                <Button
+                  marginY={8}
+                  iconBefore={DownloadIcon}
+                  onClick={() => handleDownload(file.alias)}
+                >
+                  Télécharger en ZIP
+                </Button>
+                <Button
+                  marginY={8}
+                  iconBefore={TrashIcon}
+                  intent="danger"
+                  onClick={() => onDelete(file.alias)}
+                >
+                  Supprimer
+                </Button>
               </Table.TextCell>
             </Table.Row>
           ))}

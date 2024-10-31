@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import FileUpload from './components/FileUpload';
 import Dashboard from './components/Dashboard';
 import { TabNavigation, Tab } from 'evergreen-ui';
 import './App.css';
 
 const App: React.FC = () => {
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; alias: string }[]>([]);
-  const location = useLocation();
-
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; alias: string, size: number }[]>([]);
+  
   const handleFileUpload = (file: File, alias: string) => {
-    setUploadedFiles((prevFiles) => [...prevFiles, { name: file.name, alias }]);
+    setUploadedFiles((prevFiles) => [...prevFiles, { name: file.name, alias, size: file.size }]);
+  };
+
+  const handleDeleteFile = (alias: string) => {
+    setUploadedFiles(uploadedFiles.filter((file) => file.alias !== alias));
   };
 
   const tabs = [
@@ -34,7 +37,7 @@ const App: React.FC = () => {
       </TabNavigation>
       <Routes>
         <Route path="/" element={<FileUpload onFileUpload={handleFileUpload} />} />
-        <Route path="/dashboard" element={<Dashboard uploadedFiles={uploadedFiles} />} />
+        <Route path="/dashboard" element={<Dashboard uploadedFiles={uploadedFiles} onDelete={handleDeleteFile} />} />
       </Routes>
     </div>
   );
