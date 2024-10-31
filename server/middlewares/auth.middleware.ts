@@ -14,7 +14,8 @@ export const verifyToken = (
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-        req.body = decoded;
+        //@ts-ignore
+        req.body.mail = decoded.mail;
         next();
     } catch (error) {
         res.status(401).json({ message: 'Invalid token' });
