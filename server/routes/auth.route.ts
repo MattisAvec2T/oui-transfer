@@ -8,7 +8,7 @@ export default function getAuthRoutes(app: App) {
     const authRoutes = Router();
     authRoutes.post("/register", checkSchema(userSchema().withUsername()), registerController(app));
     authRoutes.post("/login", checkSchema(userSchema().schema), loginController(app));
-    authRoutes.post("/logout", logoutController);
+    authRoutes.post("/logout", logoutController());
 
     return authRoutes;
 }

@@ -8,7 +8,7 @@ dotenv.config();
 
 
 export function registerController(app: App) {
-    async (req: Request, res: Response) => {
+    return async (req: Request, res: Response) => {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -27,7 +27,7 @@ export function registerController(app: App) {
 }
 
 export function loginController(app: App) {
-    async (req: Request, res: Response) => {
+    return async (req: Request, res: Response) => {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -38,10 +38,10 @@ export function loginController(app: App) {
             const hashedUser = { ...user };
             hashedUser.password = hashedPassword;
             // DB shenanigans
-            pool.query(
-                "SELECT username, mail FROM users WHERE mail = ? AND password = ?",
-                [user.mail, hashedPassword]
-            );
+            // pool.query(
+            //     "SELECT username, mail FROM users WHERE mail = ? AND password = ?",
+            //     [user.mail, hashedPassword]
+            // );
             // Si résultat : 
             const token = jwt.sign(
                 { name:"user@mail" },// { user.mail },
@@ -58,7 +58,7 @@ export function loginController(app: App) {
 }
 
 export function logoutController() {
-    async (_: Request, res: Response) => {
+    return async (_: Request, res: Response) => {
         res.clearCookie("token");
         res.status(205).json({ "success" : true });
     }
