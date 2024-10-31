@@ -63,6 +63,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
         <Pane maxWidth={654}>
           <FileUploader
             label="Upload File"
+            description="La taille maximale du fichier est 2Go"
             maxFiles={1}
             onChange={handleChange}
             onRejected={handleRejected}
