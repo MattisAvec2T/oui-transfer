@@ -33,6 +33,55 @@ export function uploadController(app: App) {
   };
 }
 
+export function getFilesController(app: App) {
+    return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+      try {
+        const user: UserInterface = {
+          mail: req.userMail,
+        };
+        const files : FileInterface[] = await app.repository.FileRepository.getUserFiles(user)
+        res.status(200).json({
+          message: "Fichier téléchargé",
+          data: files
+        });
+      } catch (error) {
+        next(error)
+      }
+    };
+  }
+
+  export function deleteFileController(app: App) {
+    return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+      try {
+        const file: FileInterface = {
+          filePath: req.params.filePath,
+        };
+
+        const user: UserInterface = {
+          mail: req.userMail,
+        };
+        await app.repository.FileRepository.deleteFile(file, user);
+        try {
+          const __filepath = fileURLToPath(import.meta.url);
+          const __dirname = path.dirname(__filepath);
+          const filePath = path.join(__dirname, "../uploads", file.filePath);
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error("Erreur lors de la suppression du fichier dans le file system :", err);
+            }
+          })
+        } catch (error) {
+          console.error("Erreur lors de la suppression du fichier dans le file system :", error);
+        }
+        res.status(200).json({
+          message: "Fichier supprimé",
+        });
+      } catch (error) {
+        next(error)
+      }
+    };
+  }
+
 export function downloadController(app: App) {
   return async (req: Request, res: Response) => {
     const __filename = fileURLToPath(import.meta.url);
