@@ -34,92 +34,112 @@ export function uploadController(app: App) {
 }
 
 export function getFilesController(app: App) {
-    return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
-      try {
-        const user: UserInterface = {
-          mail: req.userMail,
-        };
-        const files : FileInterface[] = await app.repository.FileRepository.getUserFiles(user)
-        res.status(200).json({
-          message: "Fichier téléchargé",
-          data: files
-        });
-      } catch (error) {
-        next(error)
-      }
-    };
-  }
-
-  export function deleteFileController(app: App) {
-    return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
-      try {
-        const file: FileInterface = {
-          filePath: req.params.filePath,
-        };
-
-        const user: UserInterface = {
-          mail: req.userMail,
-        };
-        await app.repository.FileRepository.deleteFile(file, user);
-        try {
-          const __filepath = fileURLToPath(import.meta.url);
-          const __dirname = path.dirname(__filepath);
-          const filePath = path.join(__dirname, "../uploads", file.filePath);
-          fs.unlink(filePath, (err) => {
-            if (err) {
-              console.error("Erreur lors de la suppression du fichier dans le file system :", err);
-            }
-          })
-        } catch (error) {
-          console.error("Erreur lors de la suppression du fichier dans le file system :", error);
-        }
-        res.status(200).json({
-          message: "Fichier supprimé",
-        });
-      } catch (error) {
-        next(error)
-      }
-    };
-  }
-
-export function downloadController(app: App) {
-  return async (req: Request, res: Response) => {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const { filename } = req.params;
-    const filePath = path.join(__dirname, "uploads", filename);
-
-    if (fs.existsSync(filePath)) {
-      try {
-        const zip = new JSZip();
-        const fileData = fs.readFileSync(filePath);
-
-        // DB shenanigans + map bien fun
-        // const originalName = uploadedFilesMap.get(filename);
-
-        const originalName = "";
-        zip.file(originalName, fileData);
-
-        const zipData = await zip.generateAsync({ type: "nodebuffer" });
-
-        res.set({
-          "Content-Disposition": `attachment; filename=${filename}.zip`,
-          "Content-Type": "application/zip",
-        });
-        res.send(zipData);
-      } catch (error) {
-        console.error("Erreur lors de la création du fichier ZIP:", error);
-        res
-          .status(500)
-          .json({ error: "Erreur lors de la création du fichier ZIP" });
-      }
-    } else {
-      console.log("Fichier introuvable:", filePath);
-      res.status(404).json({ error: "Fichier introuvable" });
+  return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    try {
+      const user: UserInterface = {
+        mail: req.userMail,
+      };
+      const files : FileInterface[] = await app.repository.FileRepository.getUserFiles(user)
+      res.status(200).json({
+        message: "Fichier téléchargé",
+        data: files
+      });
+    } catch (error) {
+      next(error)
     }
   };
 }
-function next(error: unknown) {
-    throw new Error("Function not implemented.");
+
+export function generateDownloadLinkController(app: App) {
+  return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    try {
+      const files: FileInterface[] = req.body.files.map((file: { filePath: string }) => ({
+        filePath: file.filePath,
+      }));
+
+      const user: UserInterface = {
+        mail: req.userMail,
+      };
+
+      const uniqueKey = await app.repository.FileRepository.generateDownloadLink(files, user);
+      
+      res.status(200).json({
+        message: "Fichier téléchargé",
+        data: uniqueKey
+      });
+    } catch (error) {
+      next(error)
+    }
+  };
 }
 
+export function deleteFileController(app: App) {
+  return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    try {
+      const file: FileInterface = {
+        filePath: req.params.filePath,
+      };
+
+      const user: UserInterface = {
+        mail: req.userMail,
+      };
+      await app.repository.FileRepository.deleteFile(file, user);
+      try {
+        const __filepath = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filepath);
+        const filePath = path.join(__dirname, "../uploads", file.filePath);
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Erreur lors de la suppression du fichier dans le file system :", err);
+          }
+        })
+      } catch (error) {
+        console.error("Erreur lors de la suppression du fichier dans le file system :", error);
+      }
+      res.status(200).json({
+        message: "Fichier supprimé",
+      });
+    } catch (error) {
+      next(error)
+    }
+  };
+}
+
+export function downloadController(app: App) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const uniqueKey = req.params.uniqueKey;
+      
+      const files: FileInterface[] = await app.repository.FileRepository.getDownloadLinkFiles(uniqueKey);
+      
+      const __filepath = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filepath);
+      const uploadsDir = path.join(__dirname, "../uploads");
+
+      const zip = new JSZip();
+
+      for (const file of files) {
+        const filePath = path.join(uploadsDir, file.filePath);
+        
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          zip.file(file.fileName!, fileData); 
+        } else {
+          console.warn(`Fichier introuvable : ${filePath}`);
+        }
+      }
+
+      const zipData = await zip.generateAsync({ type: "nodebuffer" });
+
+      res.set({
+        "Content-Disposition": `attachment; filename=oui-transfer.zip`,
+        "Content-Type": "application/zip",
+      });
+      res.send(zipData);
+
+    } catch (error) {
+      console.error("Erreur lors de la création du fichier ZIP:", error);
+      next(error);
+    }
+  };
+}

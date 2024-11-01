@@ -8,6 +8,8 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
   const MAX_QUOTA_MB = 2048;
   const [uploadedFiles, setUploadedFiles] = useState<{ file_name: string; file_path: string; file_size: number }[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUploadedFiles = async () => {
@@ -73,6 +75,36 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
     }
   };
 
+  const handleFileSelect = (file_path: string) => {
+    setSelectedFiles(prevSelected =>
+      prevSelected.includes(file_path)
+        ? prevSelected.filter(path => path !== file_path)
+        : [...prevSelected, file_path]
+    );
+  };
+
+  const handleGenerateLink = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/generate-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ files: selectedFiles.map(file_path => ({ filePath: file_path })) })
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la génération du lien de téléchargement");
+      }
+
+      const result = await response.json();
+      setGeneratedLink(`http://localhost:3000/download/${result.data}`);
+    } catch (error) {
+      console.error("Erreur lors de la génération du lien de téléchargement:", error);
+    }
+  };
+
   const getAliasWithoutExtension = (file_path: string) => {
     const lastDotIndex = file_path.lastIndexOf('.');
     return lastDotIndex !== -1 ? file_path.slice(0, lastDotIndex) : file_path;
@@ -84,6 +116,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
       <p>Quota restant : {quotaRemaining.toFixed(2)} Mo</p>
       <Table>
         <Table.Head>
+          <Table.TextCell flexBasis={50} flexShrink={0} flexGrow={1}>Sélection</Table.TextCell>
           <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>Nom du Fichier</Table.TextCell>
           <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>Taille du Fichier (Mo)</Table.TextCell>
           <Table.TextCell flexBasis={300} flexShrink={0} flexGrow={1}>Actions</Table.TextCell>
@@ -91,6 +124,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
         <Table.Body>
           {uploadedFiles.map((file, index) => (
             <Table.Row key={index}>
+              <Table.TextCell flexBasis={50} flexShrink={0} flexGrow={1}>
+                <input
+                  type="checkbox"
+                  checked={selectedFiles.includes(file.file_path)}
+                  onChange={() => handleFileSelect(file.file_path)}
+                />
+              </Table.TextCell>
               <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>{file.file_name}</Table.TextCell>
               <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>{(file.file_size / (1024 * 1024)).toFixed(2)} Mo</Table.TextCell>
               <Table.TextCell flexBasis={300} flexShrink={0} flexGrow={1}>
@@ -106,15 +146,22 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
                     marginRight={15}
                   />
                 </Tooltip>
-
-                <Tooltip content="Générer lien de partage" position={Position.TOP}>
-                  <IconButton icon={LinkIcon} />
-                </Tooltip>
               </Table.TextCell>
             </Table.Row>
           ))}
         </Table.Body>
       </Table>
+      <button onClick={handleGenerateLink} disabled={selectedFiles.length === 0}>
+        Générer lien de téléchargement pour les fichiers sélectionnés
+      </button>
+      {generatedLink && (
+        <div>
+          <p>Lien généré :</p>
+          <a href={generatedLink} target="_blank" rel="noopener noreferrer">
+            {generatedLink}
+          </a>
+        </div>
+      )}
     </div>
   );
 };
