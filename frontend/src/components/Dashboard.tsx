@@ -61,8 +61,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
         method: 'DELETE',
         credentials: "include"
       });
-      console.log(response);
-      
 
       if (!response.ok) {
         throw new Error('Erreur lors de la suppression du fichier');

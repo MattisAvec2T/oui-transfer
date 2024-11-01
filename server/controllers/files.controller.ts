@@ -60,7 +60,19 @@ export function getFilesController(app: App) {
         const user: UserInterface = {
           mail: req.userMail,
         };
-        await app.repository.FileRepository.deleteFile(file, user)
+        await app.repository.FileRepository.deleteFile(file, user);
+        try {
+          const __filepath = fileURLToPath(import.meta.url);
+          const __dirname = path.dirname(__filepath);
+          const filePath = path.join(__dirname, "../uploads", file.filePath);
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error("Erreur lors de la suppression du fichier dans le file system :", err);
+            }
+          })
+        } catch (error) {
+          console.error("Erreur lors de la suppression du fichier dans le file system :", error);
+        }
         res.status(200).json({
           message: "Fichier supprimé",
         });
