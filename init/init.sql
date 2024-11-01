@@ -2,9 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL,
     mail VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    quota INT DEFAULT 2048,
-    used_space INT DEFAULT 0
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS files (
@@ -12,7 +10,7 @@ CREATE TABLE IF NOT EXISTS files (
     user_id INT NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(255) NOT NULL,
-    file_size INT NOT NULL,  -- taille en octets
+    file_size INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

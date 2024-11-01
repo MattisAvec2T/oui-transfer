@@ -38,6 +38,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
     try {
       const response = await fetch('http://localhost:3000/upload', {
+        credentials: "include",
         method: 'POST',
         body: formData,
       });
