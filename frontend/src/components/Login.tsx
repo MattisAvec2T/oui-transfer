@@ -24,7 +24,6 @@ const Login: React.FC<LoginProps> = ({ onSwitch }) => {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             if (data.success) {
                 navigate('/dashboard');
             } else {

@@ -9,7 +9,7 @@ export function userRepository(database: Pool): UserRepositoryInterface {
             //@ts-ignore
             return results[0]
         },
-        insert: async (user: UserInterface): Promise<UserInterface | Error> => {
+        insert: async (user: UserInterface): Promise<UserInterface | void> => {
             try {
                 await database.execute(
                     "INSERT INTO users (username, mail, password) VALUES (?, ?, ?)",
@@ -20,7 +20,7 @@ export function userRepository(database: Pool): UserRepositoryInterface {
                 if (error.code === 'ER_DUP_ENTRY') {
                     throw new CustomError({ code: 401, message: "The email ${user.mail} is already used."});
                 } else {
-                    throw (error instanceof CustomError) ?  error : new Error('An error occurred while creating account. Please try again later.');
+                    throw new Error('An error occurred while creating account. Please try again later.');
                 }
             }
         },
