@@ -12,6 +12,7 @@ export interface FileRepositoryInterface {
     saveFile: (file: FileInterface, user: UserInterface) => Promise<FileInterface | void>;
     checkUploadLimit: (file: FileInterface, user: UserInterface) => Promise<FileInterface | void>;
     deleteFile: (file: FileInterface, user: UserInterface) => Promise<void>;
+    updateFile: (file: FileInterface, user: UserInterface) => Promise<void>;
     getUserFiles: (user: UserInterface) => Promise<FileInterface[]>;
     generateDownloadLink: (files: FileInterface[], user: UserInterface) => Promise<string>;
 }

@@ -105,6 +105,33 @@ export function deleteFileController(app: App) {
   };
 }
 
+export function updateController(app: App) {
+  return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    try {
+      
+      const file: FileInterface = {
+        fileName: req.body.fileName,
+        filePath: req.body.filePath,
+      };
+
+      const user: UserInterface = {
+        mail: req.userMail,
+      };
+
+      console.log(file, user);
+      
+      await app.repository.FileRepository.updateFile(file, user);
+      
+      res.status(200).json({
+        message: "Fichier mis à jour",
+        file : file
+      });
+    } catch (error) {
+      next(error)
+    }
+  }
+}
+
 export function downloadController(app: App) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -134,11 +161,9 @@ export function downloadController(app: App) {
       res.set({
         "Content-Disposition": `attachment; filename=oui-transfer.zip`,
         "Content-Type": "application/zip",
-      });
-      res.send(zipData);
+      }).send(zipData);
 
     } catch (error) {
-      console.error("Erreur lors de la création du fichier ZIP:", error);
       next(error);
     }
   };

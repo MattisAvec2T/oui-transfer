@@ -80,6 +80,18 @@ export function fileRepository(database: Pool): FileRepositoryInterface {
             : new Error("An error occurred while deleting files. Please try again later.");
         }
     },
+    updateFile: async (file: FileInterface, user: UserInterface): Promise<void> => {
+      try {
+        const [rows] = await database.execute(
+          "UPDATE files SET file_name = ? WHERE file_path = ? AND user_id = (SELECT id FROM users WHERE mail = ?)",
+          [file.fileName, file.filePath, user.mail]
+        );
+      } catch (error) {
+        throw error instanceof CustomError
+          ? error
+          : new Error("An error occurred while updating file. Please try again later.");
+      }
+  },
     getUserFiles: async (user: UserInterface): Promise<FileInterface[]> => {
       try {
         const [rows] = await database.execute(
