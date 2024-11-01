@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import Login from '../components/Login';
 import Register from '../components/Register';
 
-const Connection: React.FC = () => {
+interface AuthProps {
+    onLogin: (name: string) => void;
+}
+
+const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const [isLogin, setIsLogin] = useState<boolean>(true);
 
     const toggleComponent = () => {
@@ -11,9 +15,13 @@ const Connection: React.FC = () => {
 
     return (
         <div>
-            {isLogin ? <Login onSwitch={toggleComponent} /> : <Register onSwitch={toggleComponent} />}
+            {isLogin ? (
+                <Login onSwitch={toggleComponent} onLogin={onLogin} />
+            ) : (
+                <Register onSwitch={toggleComponent} />
+            )}
         </div>
     );
 };
 
-export default Connection;
+export default Auth;
