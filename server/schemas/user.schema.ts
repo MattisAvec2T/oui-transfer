@@ -26,7 +26,11 @@ export function userSchema() {
                 errorMessage: "Must be a valid email address"
             },
             normalizeEmail: true,
-            escape: true
+            escape: true,
+            matches: {
+                options: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                errorMessage: "Email must be a valid format"
+            }
         },
         password: {
             exists: {
