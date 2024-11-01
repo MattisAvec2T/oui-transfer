@@ -2,12 +2,12 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { DownloadIcon, Table, TrashIcon, LinkIcon, Tooltip, Position, IconButton } from 'evergreen-ui';
 
 interface DashboardProps {
-  onDelete: (alias: string) => void;
+  onDelete: (file_path: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
   const MAX_QUOTA_MB = 2048;
-  const [uploadedFiles, setUploadedFiles] = useState<{ file_name: string; alias: string; file_size: number }[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<{ file_name: string; file_path: string; file_size: number }[]>([]);
 
   useEffect(() => {
     const fetchUploadedFiles = async () => {
@@ -34,9 +34,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
     return MAX_QUOTA_MB - usedSpace;
   }, [uploadedFiles]);
 
-  const handleDownload = async (alias: string) => {
+  const handleDownload = async (file_path: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/download-zip/${alias}`);
+      const response = await fetch(`http://localhost:3000/download-zip/${file_path}`);
       if (!response.ok) {
         throw new Error('Erreur lors du téléchargement du fichier ZIP');
       }
@@ -45,7 +45,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${getAliasWithoutExtension(alias)}.zip`;
+      link.download = `${getAliasWithoutExtension(file_path)}.zip`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -55,27 +55,29 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
     }
   };
 
-  const handleDelete = async (alias: string) => {
+  const handleDelete = async (file_path: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/delete/${alias}`, {
+      const response = await fetch(`http://localhost:3000/delete/${file_path}`, {
         method: 'DELETE',
         credentials: "include"
       });
+      console.log(response);
+      
 
       if (!response.ok) {
         throw new Error('Erreur lors de la suppression du fichier');
       }
 
-      setUploadedFiles(prevFiles => prevFiles.filter(file => file.alias !== alias));
-      onDelete(alias);
+      setUploadedFiles(prevFiles => prevFiles.filter(file => file.file_path !== file_path));
+      onDelete(file_path);
     } catch (error) {
       console.error('Erreur lors de la suppression du fichier:', error);
     }
   };
 
-  const getAliasWithoutExtension = (alias: string) => {
-    const lastDotIndex = alias.lastIndexOf('.');
-    return lastDotIndex !== -1 ? alias.slice(0, lastDotIndex) : alias;
+  const getAliasWithoutExtension = (file_path: string) => {
+    const lastDotIndex = file_path.lastIndexOf('.');
+    return lastDotIndex !== -1 ? file_path.slice(0, lastDotIndex) : file_path;
   };
 
   return (
@@ -95,14 +97,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
               <Table.TextCell flexBasis={200} flexShrink={0} flexGrow={1}>{(file.file_size / (1024 * 1024)).toFixed(2)} Mo</Table.TextCell>
               <Table.TextCell flexBasis={300} flexShrink={0} flexGrow={1}>
                 <Tooltip content="Télécharger en ZIP" position={Position.TOP}>
-                  <IconButton icon={DownloadIcon} onClick={() => handleDownload(file.alias)} marginRight={15} />
+                  <IconButton icon={DownloadIcon} onClick={() => handleDownload(file.file_path)} marginRight={15} />
                 </Tooltip>
 
                 <Tooltip content="Supprimer" position={Position.TOP}>
                   <IconButton
                     icon={TrashIcon}
                     intent="danger"
-                    onClick={() => handleDelete(file.alias)}
+                    onClick={() => handleDelete(file.file_path)}
                     marginRight={15}
                   />
                 </Tooltip>

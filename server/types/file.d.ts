@@ -1,9 +1,9 @@
 import { UserInterface } from "./user";
 
 export interface FileInterface {
-    fileName: string;
+    fileName?: string;
     filePath: string;
-    fileSize: number;
+    fileSize?: number;
     createdAt?: Date;
 }
 

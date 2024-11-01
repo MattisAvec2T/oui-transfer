@@ -54,12 +54,8 @@ export function uploadedFilesController(app: App) {
     return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
       try {
         const file: FileInterface = {
-            fileName: req.file!.originalname,
-            filePath: req.file!.filename,
-            fileSize: req.file!.size,
-          };
-          console.log('file', file);
-          
+          filePath: req.params.filePath,
+        };
 
         const user: UserInterface = {
           mail: req.userMail,
