@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Card, Button, TextInputField, Pane } from 'evergreen-ui';
+import { Card, Button, TextInputField, Pane, toaster } from 'evergreen-ui';
 import { useNavigate } from 'react-router-dom';
 
 interface LoginProps {
     onSwitch: () => void;
+    onLogin: (name: string) => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onSwitch }) => {
+const Login: React.FC<LoginProps> = ({ onSwitch, onLogin }) => {
     const [mail, setMail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
@@ -25,19 +26,23 @@ const Login: React.FC<LoginProps> = ({ onSwitch }) => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                toaster.success("Connexion réussie !");
+                onLogin(mail);
                 navigate('/dashboard');
             } else {
-                alert("Error");
+                toaster.danger("Erreur de connexion. Veuillez vérifier vos identifiants.");
             }
         })
-        .catch(err => console.log(err));
-        
+        .catch(err => {
+            console.log(err);
+            toaster.danger("Une erreur s'est produite lors de la connexion. Veuillez réessayer.");
+        });
     };
 
     return (
         <Pane display="flex" justifyContent="center" marginTop="10px">
             <Card elevation={1} padding={24} width={400} background="tint2" display="flex" flexDirection="column" alignItems="center">
-            <h2>Connexion</h2>
+                <h2>Connexion</h2>
                 <form onSubmit={handleSubmit}>
                     <TextInputField
                         marginBottom="10px"

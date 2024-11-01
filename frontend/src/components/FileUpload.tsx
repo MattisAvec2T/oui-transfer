@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Pane, FileUploader, FileCard, Button, UploadIcon, Card } from 'evergreen-ui';
+import { Pane, FileUploader, FileCard, Button, UploadIcon, Card, toaster } from 'evergreen-ui';
 
 interface FileUploadProps {
   onFileUpload: (file: File, alias: string, size: number) => void;
@@ -29,7 +29,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const handleUpload = async () => {
     const file = files[0];
     if (!file) {
-      setError('Veuillez sélectionner un fichier à uploader.');
+      toaster.danger('Veuillez sélectionner un fichier à uploader.')
       return;
     }
 
@@ -49,7 +49,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
       const data = await response.json();
       onFileUpload(file, data.alias, file.size);
-      alert('Fichier uploadé avec succès');
+      toaster.success('Fichier uploadé avec succès');
       handleRemove();
     } catch (error) {
       setError("Erreur lors de l'upload du fichier : " + error);
@@ -66,6 +66,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
             label="Upload File"
             description="La taille maximale du fichier est 2Go"
             maxFiles={1}
+            maxSizeInBytes={2147483648}
             onChange={handleChange}
             onRejected={handleRejected}
             renderFile={(file) => {
