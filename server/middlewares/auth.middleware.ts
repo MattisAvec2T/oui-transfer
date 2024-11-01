@@ -1,3 +1,4 @@
+import CustomError from "errors/custom.error";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -7,9 +8,10 @@ export const verifyToken = (
     next: NextFunction
 ) => {
     const token = req.cookies?.token;
+    console.debug(req);
 
     if (!token) {
-       res.status(401).json({ success: false, message: "No token provided" });
+        throw new CustomError({ code: 401, message: "No token provided" });
     }
 
     try {
@@ -18,6 +20,6 @@ export const verifyToken = (
         req.body.mail = decoded.mail;
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Invalid token' });
+        throw new CustomError({ code: 401, message: "Invalid token" });
     }
 };
