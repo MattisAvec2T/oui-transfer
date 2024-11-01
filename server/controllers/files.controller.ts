@@ -15,9 +15,9 @@ export function uploadController(app: App) {
             // uploadedFilesMap.set(storedFileName, originalName);
         
             res.status(200).json({
-            message: 'Fichier téléchargé',
-            alias: storedFileName,
-            originalName: originalName,
+                message: 'Fichier téléchargé',
+                alias: storedFileName,
+                originalName: originalName,
             });
         } catch (error) {
             res.status(500).json({ error: 'Erreur lors du téléchargement du fichier' });

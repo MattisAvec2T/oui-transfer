@@ -1,6 +1,6 @@
 import {Pool} from "mysql2/promise";
 import {UserInterface, UserRepositoryInterface} from "../types/user";
-import DatabaseError from "../errors/database.error";
+import CustomError from "../errors/custom.error";
 
 export function userRepository(database: Pool): UserRepositoryInterface {
     return {
@@ -18,9 +18,9 @@ export function userRepository(database: Pool): UserRepositoryInterface {
                 return user;
             } catch (error: any) {
                 if (error.code === 'ER_DUP_ENTRY') {
-                    throw new DatabaseError({ code: 401, message: "The email ${user.mail} is already used."});
+                    throw new CustomError({ code: 401, message: "The email ${user.mail} is already used."});
                 } else {
-                    throw (error instanceof DatabaseError) ?  error : new Error('An error occurred while creating account. Please try again later.');
+                    throw (error instanceof CustomError) ?  error : new Error('An error occurred while creating account. Please try again later.');
                 }
             }
         },
@@ -34,10 +34,10 @@ export function userRepository(database: Pool): UserRepositoryInterface {
                 if (results.length > 0) {
                     return user;
                 } else {
-                    throw new DatabaseError({ code: 401, message: "Wrong credentials"});
+                    throw new CustomError({ code: 401, message: "Wrong credentials"});
                 }
             } catch (error) {
-                throw (error instanceof DatabaseError) ?  error : new Error('An error occurred while searching for user. Please try again later.');
+                throw (error instanceof CustomError) ?  error : new Error('An error occurred while searching for user. Please try again later.');
             }
         }
     }
