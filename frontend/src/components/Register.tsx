@@ -15,17 +15,17 @@ const Register: React.FC<RegisterProps> = ({ onSwitch }) => {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-
+    
         if (!emailPattern.test(mail)) {
             toaster.danger("Veuillez entrer une adresse email valide.");
             return;
         }
-
+    
         if (password !== confirmPassword) {
             toaster.danger("Les mots de passe ne correspondent pas.");
             return;
         }
-
+    
         fetch("http://localhost:3000/register", {
             method: "POST",
             headers: {
@@ -33,21 +33,29 @@ const Register: React.FC<RegisterProps> = ({ onSwitch }) => {
             },
             body: JSON.stringify({ username, mail, password })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                console.log(response.status)
+                if (response.status === 409) {
+                    toaster.danger("Cette adresse email est déjà utilisée. Veuillez en choisir une autre.");
+                }
+                return response.json().then(data => {
+                    toaster.danger("Erreur lors de l'inscription : " + data.message);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
+            if(data.success) {
                 toaster.success("Inscription réussie !");
                 onSwitch();
-            } else {
-                toaster.danger("Erreur lors de l'inscription : " + data.message);
             }
         })
-        .catch(err => {
-            console.log(err);
+        .catch(() => {
             toaster.danger("Erreur lors de la connexion au serveur.");
         });
-        
     };
+    
 
     return (
         <Pane display="flex" justifyContent="center" marginTop="10px">

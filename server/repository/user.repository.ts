@@ -1,5 +1,5 @@
-import {Pool} from "mysql2/promise";
-import {UserInterface, UserRepositoryInterface} from "../types/user";
+import { Pool } from "mysql2/promise";
+import { UserInterface, UserRepositoryInterface } from "../types/user";
 import CustomError from "../errors/custom.error";
 
 export function userRepository(database: Pool): UserRepositoryInterface {
@@ -7,7 +7,7 @@ export function userRepository(database: Pool): UserRepositoryInterface {
         getOne: async (id: number) => {
             const [results] = await database.execute("SELECT id, username, mail, password, quota, used_space FROM users WHERE id = ?", [id]);
             //@ts-ignore
-            return results[0]
+            return results[0];
         },
         insert: async (user: UserInterface): Promise<UserInterface | void> => {
             try {
@@ -18,12 +18,13 @@ export function userRepository(database: Pool): UserRepositoryInterface {
                 return user;
             } catch (error: any) {
                 if (error.code === 'ER_DUP_ENTRY') {
-                    throw new CustomError({ code: 401, message: "The email ${user.mail} is already used."});
+                    throw new CustomError({ code: 409, message: `The email ${user.mail} is already used.`});
                 } else {
                     throw new Error('An error occurred while creating account. Please try again later.');
                 }
             }
         },
+        
         getByMailPassword: async (user: UserInterface): Promise<UserInterface | void> => {
             try {
                 const [results] = await database.execute(
@@ -34,10 +35,10 @@ export function userRepository(database: Pool): UserRepositoryInterface {
                 if (results.length > 0) {
                     return user;
                 } else {
-                    throw new CustomError({ code: 401, message: "Wrong credentials"});
+                    throw new CustomError({ code: 401, message: "Wrong credentials" });
                 }
             } catch (error) {
-                throw (error instanceof CustomError) ?  error : new Error('An error occurred while searching for user. Please try again later.');
+                throw (error instanceof CustomError) ? error : new Error('An error occurred while searching for user. Please try again later.');
             }
         }
     }

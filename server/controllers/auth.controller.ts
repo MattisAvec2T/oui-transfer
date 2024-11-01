@@ -22,7 +22,6 @@ export function registerController(app: App) {
             res.status(201).json({ success: true, user: user });
         } catch (error) {
             next(error)
-            // res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     }
 }
@@ -47,7 +46,6 @@ export function loginController(app: App) {
             res.status(201).cookie("token", token).json({ success: true, user: user });
         } catch (error) {
             next(error)
-            // res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     }
 }
