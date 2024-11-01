@@ -125,7 +125,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
     const fileToUpdate = uploadedFiles.find(file => file.file_path === file_path);
     if (fileToUpdate) {
       try {
-        const response = await fetch(`http://localhost:3000/update`, { // Changer à '/update'
+        const response = await fetch(`http://localhost:3000/update`, {
           method: 'PATCH',
           headers: {
             "Content-Type": "application/json",
@@ -141,7 +141,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onDelete }) => {
           throw new Error('Erreur lors de la mise à jour du nom du fichier');
         }
 
-        // Désactiver le mode d'édition après la sauvegarde
         setUploadedFiles(prevFiles =>
           prevFiles.map(file => 
             file.file_path === file_path ? { ...file, isEditing: false } : file
