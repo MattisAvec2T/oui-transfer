@@ -33,7 +33,7 @@ export function uploadController(app: App) {
   };
 }
 
-export function uploadedFilesController(app: App) {
+export function getFilesController(app: App) {
     return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
       try {
         const user: UserInterface = {
