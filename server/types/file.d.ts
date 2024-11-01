@@ -8,10 +8,10 @@ export interface FileInterface {
 }
 
 export interface FileRepositoryInterface {
-    saveFile: (file: FileInterface, user: UserInterface) => Promise<FileInterface | Error>;
-    checkUploadLimit: (file: FileInterface, user: UserInterface) => Promise<FileInterface | Error>;
+    saveFile: (file: FileInterface, user: UserInterface) => Promise<FileInterface | void>;
+    checkUploadLimit: (file: FileInterface, user: UserInterface) => Promise<FileInterface | void>;
     getFileById: (id: number) => Promise<FileInterface | null>;
-    deleteFile: (id: number) => Promise<void>;
-    getUserFiles: (userId: number) => Promise<FileInterface[]>;
+    deleteFile: (file: FileInterface, user: UserInterface) => Promise<void>;
+    getUserFiles: (user: UserInterface) => Promise<FileInterface[]>;
     updateUserSpace: (userId: number, fileSize: number) => Promise<void>;
 }

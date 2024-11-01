@@ -33,6 +33,47 @@ export function uploadController(app: App) {
   };
 }
 
+export function uploadedFilesController(app: App) {
+    return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+      try {
+        const user: UserInterface = {
+          mail: req.userMail,
+        };
+        const files : FileInterface[] = await app.repository.FileRepository.getUserFiles(user)
+        res.status(200).json({
+          message: "Fichier téléchargé",
+          data: files
+        });
+      } catch (error) {
+        next(error)
+      }
+    };
+  }
+
+  export function deleteFileController(app: App) {
+    return async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+      try {
+        const file: FileInterface = {
+            fileName: req.file!.originalname,
+            filePath: req.file!.filename,
+            fileSize: req.file!.size,
+          };
+          console.log('file', file);
+          
+
+        const user: UserInterface = {
+          mail: req.userMail,
+        };
+        await app.repository.FileRepository.deleteFile(file, user)
+        res.status(200).json({
+          message: "Fichier supprimé",
+        });
+      } catch (error) {
+        next(error)
+      }
+    };
+  }
+
 export function downloadController(app: App) {
   return async (req: Request, res: Response) => {
     const __filename = fileURLToPath(import.meta.url);
